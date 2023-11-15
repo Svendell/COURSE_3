@@ -1,0 +1,27 @@
+<!--https://learn.javascript.ru/fetch-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XMLHttpRequest Example</title>
+</head>
+<body>
+    <h1>
+        <span id="name"></span>
+    </h1>
+
+    <script>
+       async function fetchDataAndInsertContent() {
+        // Выполните GET-запрос к целевой странице
+        const response = await fetch('http://127.0.0.1:5000/api/name');
+        const html = await response.json();
+        // Вставьте разметку на вашу текущую страницу
+        const nameElement = document.getElementById('name');
+        nameElement.textContent = html.lastName + ' ' + html.firstName + ' ' + html.middleName;
+        }
+        // Вызовите функцию для выполнения запроса и вставки контента
+        fetchDataAndInsertContent();
+    </script>
+</body>
+</html>

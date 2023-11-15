@@ -1,0 +1,17 @@
+{
+    "name": "m05_piaa",
+    "version": "1.0.1",
+    "description": "",
+    "main": "m05_piaa.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "Piasetsky Ilya",
+    "license": "ISC",
+    "dependencies": {
+        "m05_piaa": "^1.0.1",
+        "nodemailer": "^6.9.6",
+        "nodemailer-smtp-transport": "^2.7.4"
+    }
+}

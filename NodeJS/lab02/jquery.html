@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jQuery Example</title>
+    <!-- Подключение библиотеки jQuery через CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Имя: <span id="result"></span></h1>
+
+    <script>
+        // Выполнение асинхронного GET-запроса с jQuery
+        $.ajax({
+            url: 'http://localhost:5000/api/name',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                // Вставка полученных данных в HTML-разметку
+                $('#result').text(data.lastName + ' ' + data.firstName + ' ' + data.middleName);
+            },
+            error: function (xhr, status, error) {
+                console.error('Ошибка запроса:', status, error);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XMLHttpRequest Example</title>
+</head>
+<body>
+    <h1>
+        <span id="name"></span>
+    </h1>
+
+    <script>
+        //XMLHttpRequest() - API, доступный в скриптовых языках браузеров, таких как JavaScript
+        const xhr = new XMLHttpRequest();
+        //open лишь конфигурирует запрос, но непосредственно отсылается запрос только лишь после вызова send
+        xhr.open('GET', '/api/name', true);
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                const data = JSON.parse(xhr.responseText);
+                const nameElement = document.getElementById('name');
+                nameElement.textContent = data.lastName + ' ' + data.firstName + ' ' + data.middleName;
+            } else {
+                console.error('Ошибка запроса:', xhr.status);
+            }
+        };
+
+        xhr.onerror = function () {
+            console.error('Ошибка сети');
+        };
+
+        xhr.send();
+    </script>
+</body>
+</html>

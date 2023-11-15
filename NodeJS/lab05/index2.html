@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>lab05_NMailer</title>
+    </head>
+<body>
+    <h1>Email Sender</h1>
+    <form action="/send" method="post">
+        <label for="receiver">Receiver Email:</label>
+        <input type="email" name="receiver" id="receiver" required><br><br>
+
+        <label for="message">Message:</label><br>
+        <textarea name="message" id="message" rows="4" required></textarea><br><br>
+
+        <button type="submit">Send Email</button>
+    </form>
+</body>
+</html>
