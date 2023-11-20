@@ -1,0 +1,33 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=082c516e_002D6cc9_002D471f_002Db771_002Da30ec3d6f675/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Divide_Numbers_ReturnsQuotient #3" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::D79387CC-BDB0-4251-8FFD-8C0102A5DD6A::.NETFramework,Version=v4.8::CalcTests.CalculatorTests.Divide_Numbers_ReturnsQuotient&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::D79387CC-BDB0-4251-8FFD-8C0102A5DD6A::.NETFramework,Version=v4.8::CalcTests.CalculatorTests.Divide_Numbers_ReturnsQuotient(6,2,3)&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::D79387CC-BDB0-4251-8FFD-8C0102A5DD6A::.NETFramework,Version=v4.8::CalcTests.CalculatorTests.Divide_Numbers_ReturnsQuotient(133,1,133)&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::D79387CC-BDB0-4251-8FFD-8C0102A5DD6A::.NETFramework,Version=v4.8::CalcTests.CalculatorTests.Divide_Numbers_ReturnsQuotient(35,5,7)&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::D79387CC-BDB0-4251-8FFD-8C0102A5DD6A::.NETFramework,Version=v4.8::CalcTests.CalculatorTests.Divide_Numbers_ReturnsQuotient(220,2,110)&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=27b61005_002D12c2_002D4643_002D9be2_002Dfc4b16fb88e9/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Divide_Numbers_ReturnsQuotient #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::D79387CC-BDB0-4251-8FFD-8C0102A5DD6A::.NETFramework,Version=v4.8::CalcTests.CalculatorTests.Divide_Numbers_ReturnsQuotient&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::D79387CC-BDB0-4251-8FFD-8C0102A5DD6A::.NETFramework,Version=v4.8::CalcTests.CalculatorTests.Divide_Numbers_ReturnsQuotient(6,2,3)&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::D79387CC-BDB0-4251-8FFD-8C0102A5DD6A::.NETFramework,Version=v4.8::CalcTests.CalculatorTests.Divide_Numbers_ReturnsQuotient(133,1,133)&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::D79387CC-BDB0-4251-8FFD-8C0102A5DD6A::.NETFramework,Version=v4.8::CalcTests.CalculatorTests.Divide_Numbers_ReturnsQuotient(35,5,7)&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::D79387CC-BDB0-4251-8FFD-8C0102A5DD6A::.NETFramework,Version=v4.8::CalcTests.CalculatorTests.Divide_Numbers_ReturnsQuotient(220,2,110)&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=331a32b5_002D53bf_002D4c61_002Db155_002D5aae71be9413/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Divide_Numbers_ReturnsQuotient" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::D79387CC-BDB0-4251-8FFD-8C0102A5DD6A::.NETFramework,Version=v4.8::CalcTests.CalculatorTests.Divide_Numbers_ReturnsQuotient&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::D79387CC-BDB0-4251-8FFD-8C0102A5DD6A::.NETFramework,Version=v4.8::CalcTests.CalculatorTests.Divide_Numbers_ReturnsQuotient(6,2,3)&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::D79387CC-BDB0-4251-8FFD-8C0102A5DD6A::.NETFramework,Version=v4.8::CalcTests.CalculatorTests.Divide_Numbers_ReturnsQuotient(133,1,133)&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::D79387CC-BDB0-4251-8FFD-8C0102A5DD6A::.NETFramework,Version=v4.8::CalcTests.CalculatorTests.Divide_Numbers_ReturnsQuotient(35,5,7)&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::D79387CC-BDB0-4251-8FFD-8C0102A5DD6A::.NETFramework,Version=v4.8::CalcTests.CalculatorTests.Divide_Numbers_ReturnsQuotient(220,2,110)&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=b12def29_002D5e29_002D4536_002Da39b_002Def5ddd1ed255/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="CalculatorTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::59A715D2-DE45-48D9-9101-6BE402E64240::net6.0::Laba_07_CsharpCalc_UnitTests.CalculatorTests&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

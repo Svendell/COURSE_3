@@ -1,0 +1,3 @@
+D:\BSTU_3\TestingTheory\Laba_06_CsharpCalc_UnitTests\CalcTests\obj\Debug\CalcTests.csproj.AssemblyReference.cache
+D:\BSTU_3\TestingTheory\Laba_06_CsharpCalc_UnitTests\CalcTests\obj\Debug\CalcTests.csproj.SuggestedBindingRedirects.cache
+D:\BSTU_3\TestingTheory\Laba_06_CsharpCalc_UnitTests\CalcTests\obj\Debug\CalcTests.csproj.CoreCompileInputs.cache
