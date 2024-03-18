@@ -1,0 +1,41 @@
+-- Удаление таблиц (если они существуют)
+BEGIN
+  FOR tbl IN (SELECT table_name FROM user_tables WHERE table_name IN ('Роль', 'Пользователь', 'Запросы_В_Тех_Поддежку', 'Отзывы', 'Категории')) 
+  LOOP
+    EXECUTE IMMEDIATE 'DROP TABLE ' || tbl.table_name || ' CASCADE CONSTRAINTS';
+  END LOOP;
+END;
+
+-- Создание таблиц
+CREATE TABLE Роль (
+    ID NUMBER PRIMARY KEY,
+    Роль VARCHAR2(100)
+);
+
+CREATE TABLE Пользователь (
+    ID NUMBER PRIMARY KEY,
+    Имя VARCHAR2(100),
+    Фамилия VARCHAR2(255),
+    Роль NUMBER REFERENCES Роль(ID),
+    Данные VARCHAR2(255)
+);
+
+CREATE TABLE Запросы_В_Тех_Поддежку(
+    ID_Пользователя NUMBER REFERENCES Пользователь(ID),
+    ID NUMBER PRIMARY KEY,
+    Вопрос VARCHAR2(255),
+    Статус NUMBER(1, 0)
+);
+
+CREATE TABLE Отзывы(
+    ID_Пользователя NUMBER REFERENCES Пользователь(ID),
+    ID NUMBER PRIMARY KEY,
+    Текст VARCHAR2(255),
+    Оценка NUMBER
+);
+
+CREATE TABLE Категории(
+    ID NUMBER PRIMARY KEY,
+    Название VARCHAR2(255),
+    Описание VARCHAR2(255)
+);
