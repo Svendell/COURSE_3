@@ -1,32 +1,35 @@
--- Удаление таблиц (если они существуют)
-BEGIN
-  FOR tbl IN (SELECT table_name FROM user_tables WHERE table_name IN ('Роль', 'Пользователь', 'Запросы_В_Тех_Поддежку', 'Отзывы', 'Категории')) 
-  LOOP
-    EXECUTE IMMEDIATE 'DROP TABLE ' || tbl.table_name || ' CASCADE CONSTRAINTS';
-  END LOOP;
-END;
+-- Создание последовательности для генерации уникальных идентификаторов для отзывов
+CREATE SEQUENCE seq_Отзывы
+    START WITH 1
+    INCREMENT BY 1
+    MINVALUE 1
+    NO MAXVALUE
+    NOCYCLE;
 
--- Создание таблиц
+-- Создание таблицы Роль
 CREATE TABLE Роль (
     ID NUMBER PRIMARY KEY,
     Роль VARCHAR2(100)
 );
 
+-- Создание таблицы Категории
+CREATE TABLE Категории(
+    ID NUMBER PRIMARY KEY,
+    Название VARCHAR2(255),
+    Описание VARCHAR2(255)
+);
+
+-- Создание таблицы Пользователь
 CREATE TABLE Пользователь (
     ID NUMBER PRIMARY KEY,
     Имя VARCHAR2(100),
     Фамилия VARCHAR2(255),
     Роль NUMBER REFERENCES Роль(ID),
-    Данные VARCHAR2(255)
+    Данные VARCHAR2(255),
+    Дата_и_время TIMESTAMP
 );
 
-CREATE TABLE Запросы_В_Тех_Поддежку(
-    ID_Пользователя NUMBER REFERENCES Пользователь(ID),
-    ID NUMBER PRIMARY KEY,
-    Вопрос VARCHAR2(255),
-    Статус NUMBER(1, 0)
-);
-
+-- Создание таблицы Отзывы
 CREATE TABLE Отзывы(
     ID_Пользователя NUMBER REFERENCES Пользователь(ID),
     ID NUMBER PRIMARY KEY,
@@ -34,8 +37,112 @@ CREATE TABLE Отзывы(
     Оценка NUMBER
 );
 
-CREATE TABLE Категории(
+-- Создание таблицы Запросы_В_Тех_Поддежку
+CREATE TABLE Запросы_В_Тех_Поддежку(
+    ID_Пользователя NUMBER REFERENCES Пользователь(ID),
     ID NUMBER PRIMARY KEY,
-    Название VARCHAR2(255),
-    Описание VARCHAR2(255)
+    Вопрос VARCHAR2(255),
+    Статус NUMBER
 );
+
+-- Создание таблицы Товары
+CREATE TABLE Товары(
+    ID_Лота NUMBER PRIMARY KEY,
+    ID_Пользователя NUMBER,
+    ID_Категории NUMBER REFERENCES Категории(ID),
+    Название VARCHAR2(255),
+    Описание VARCHAR2(255),
+    Цена FLOAT
+);
+
+-- Создание таблицы Сделки
+CREATE TABLE Сделки(
+    ID_Сделки NUMBER PRIMARY KEY,
+    ID_Товара NUMBER REFERENCES Товары(ID_Лота),
+    ID_Покупателя NUMBER REFERENCES Пользователь(ID),
+    ID_Продавца NUMBER REFERENCES Пользователь(ID),
+    Дата_и_время TIMESTAMP,
+    Цена FLOAT
+);
+
+-- Создание индекса для ускорения поиска пользователей по их идентификаторам
+CREATE INDEX IX_Пользователь_ID ON Пользователь(ID);
+
+-- Создание триггера для установки даты и времени добавления нового пользователя
+CREATE OR REPLACE TRIGGER trg_Добавление_Пользователя
+BEFORE INSERT ON Пользователь
+FOR EACH ROW
+BEGIN
+    :NEW.Дата_и_время := SYSTIMESTAMP;
+END;
+/
+
+-- Пример представления для получения информации о сделках с именем и фамилией покупателя
+CREATE OR REPLACE VIEW Сделки_С_Покупателями AS
+SELECT
+    С.ID_Сделки,
+    П.Имя AS Имя_Покупателя,
+    П.Фамилия AS Фамилия_Покупателя,
+    С.Дата_и_время,
+    С.Цена
+FROM
+    Сделки С
+JOIN
+    Пользователь П ON С.ID_Покупателя = П.ID;
+
+-- Пример функции для получения списка пользователей по роли
+CREATE OR REPLACE FUNCTION fn_Пользователи_По_Роли(p_RoleID NUMBER)
+RETURN SYS_REFCURSOR
+AS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+    SELECT ID AS ID_Пользователя, Имя, Фамилия, Данные
+    FROM Пользователь
+    WHERE Роль = p_RoleID;
+
+    RETURN v_cursor;
+END;
+/
+
+-- Пример функции для получения общей стоимости сделок для пользователя
+CREATE OR REPLACE FUNCTION fn_Общая_Стоимость_Сделок(p_UserID NUMBER)
+RETURN FLOAT
+AS
+    v_TotalPrice FLOAT := 0;
+BEGIN
+    SELECT SUM(Цена) INTO v_TotalPrice
+    FROM Сделки
+    WHERE ID_Покупателя = p_UserID OR ID_Продавца = p_UserID;
+
+    RETURN v_TotalPrice;
+END;
+/
+
+-- Пример функции для получения количества открытых запросов в техническую поддержку для пользователя
+CREATE OR REPLACE FUNCTION fn_Количество_Открытых_Запросов(p_UserID NUMBER)
+RETURN NUMBER
+AS
+    v_OpenRequestsCount NUMBER := 0;
+BEGIN
+    SELECT COUNT(*) INTO v_OpenRequestsCount
+    FROM Запросы_В_Тех_Поддежку
+    WHERE ID_Пользователя = p_UserID AND Статус = 1;
+
+    RETURN v_OpenRequestsCount;
+END;
+/
+
+-- Пример процедуры для добавления нового пользователя
+CREATE OR REPLACE PROCEDURE Добавить_Пользователя(
+    p_Имя VARCHAR2,
+    p_Фамилия VARCHAR2,
+    p_Роль NUMBER,
+    p_Данные VARCHAR2
+)
+AS
+BEGIN
+    INSERT INTO Пользователь (ID, Имя, Фамилия, Роль, Данные)
+    VALUES (seq_Отзывы.NEXTVAL, p_Имя, p_Фамилия, p_Роль, p_Данные);
+END;
+/
