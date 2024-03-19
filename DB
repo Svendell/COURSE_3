@@ -14,7 +14,7 @@ CREATE TABLE Роль (
 
 -- Создание таблицы Категории
 CREATE TABLE Категории(
-    ID NUMBER PRIMARY KEY,
+    ID NUMBER PRIMARY KEY ,
     Название VARCHAR2(255),
     Описание VARCHAR2(255)
 );
@@ -25,12 +25,12 @@ CREATE TABLE Пользователь (
     Имя VARCHAR2(100),
     Фамилия VARCHAR2(255),
     Роль NUMBER REFERENCES Роль(ID),
-    Данные VARCHAR2(255)
+	Данные VARCHAR2(255)
 );
 
 -- Создание таблицы Отзывы
 CREATE TABLE Отзывы(
-    ID_Пользователя NUMBER REFERENCES Пользователь(ID),
+	ID_Пользователя NUMBER REFERENCES Пользователь(ID),
     ID NUMBER PRIMARY KEY,
     Текст VARCHAR2(255),
     Оценка NUMBER
@@ -38,7 +38,7 @@ CREATE TABLE Отзывы(
 
 -- Создание таблицы Запросы_В_Тех_Поддежку
 CREATE TABLE Запросы_В_Тех_Поддежку(
-    ID_Пользователя NUMBER REFERENCES Пользователь(ID),
+	ID_Пользователя NUMBER REFERENCES Пользователь(ID),
     ID NUMBER PRIMARY KEY,
     Вопрос VARCHAR2(255),
     Статус NUMBER
@@ -47,37 +47,25 @@ CREATE TABLE Запросы_В_Тех_Поддежку(
 -- Создание таблицы Товары
 CREATE TABLE Товары(
     ID_Лота NUMBER PRIMARY KEY,
-    ID_Пользователя NUMBER,
-    ID_Категории NUMBER REFERENCES Категории(ID),
-    Название VARCHAR2(255),
-    Описание VARCHAR2(255),
+	ID_Пользователя NUMBER,
+	ID_Категории NUMBER REFERENCES Категории(ID),
+	Название VARCHAR2(255),
+	Описание VARCHAR2(255),
     Цена FLOAT
 );
 
 -- Создание таблицы Сделки
 CREATE TABLE Сделки(
     ID_Сделки NUMBER PRIMARY KEY,
-    ID_Товара NUMBER REFERENCES Товары(ID_Лота),
-    ID_Покупателя NUMBER REFERENCES Пользователь(ID),
-    ID_Продавца NUMBER REFERENCES Пользователь(ID),
-    Дата_и_время TIMESTAMP,
+	ID_Товара NUMBER REFERENCES Товары(ID_Лота),
+	ID_Покупателя NUMBER REFERENCES Пользователь(ID),
+	ID_Продавца NUMBER REFERENCES Пользователь(ID),
+	Дата_и_время TIMESTAMP,
     Цена FLOAT
 );
 
--- Создание индекса для ускорения поиска пользователей по их идентификаторам
-CREATE INDEX IX_Пользователь_ID ON Пользователь(ID);
-
--- Создание триггера для установки даты и времени добавления нового пользователя
-CREATE OR REPLACE TRIGGER trg_Добавление_Пользователя
-BEFORE INSERT ON Пользователь
-FOR EACH ROW
-BEGIN
-    :NEW.Дата_и_время := SYSTIMESTAMP;
-END;
-/
-
--- Пример представления для получения информации о сделках с именем и фамилией покупателя
-CREATE OR REPLACE VIEW Сделки_С_Покупателями AS
+-- Представление для получения информации о сделках с именем и фамилией покупателя
+CREATE VIEW Сделки_С_Покупателями AS
 SELECT
     С.ID_Сделки,
     П.Имя AS Имя_Покупателя,
@@ -89,7 +77,7 @@ FROM
 JOIN
     Пользователь П ON С.ID_Покупателя = П.ID;
 
--- Пример функции для получения списка пользователей по роли
+-- Функция для получения списка пользователей по роли
 CREATE OR REPLACE FUNCTION fn_Пользователи_По_Роли(p_RoleID NUMBER)
 RETURN SYS_REFCURSOR
 AS
@@ -104,7 +92,7 @@ BEGIN
 END;
 /
 
--- Пример функции для получения общей стоимости сделок для пользователя
+-- Функция для получения общей стоимости сделок для пользователя
 CREATE OR REPLACE FUNCTION fn_Общая_Стоимость_Сделок(p_UserID NUMBER)
 RETURN FLOAT
 AS
@@ -118,7 +106,7 @@ BEGIN
 END;
 /
 
--- Пример функции для получения количества открытых запросов в техническую поддержку для пользователя
+-- Функция для получения количества открытых запросов в техническую поддержку для пользователя
 CREATE OR REPLACE FUNCTION fn_Количество_Открытых_Запросов(p_UserID NUMBER)
 RETURN NUMBER
 AS
@@ -132,7 +120,7 @@ BEGIN
 END;
 /
 
--- Пример процедуры для добавления нового пользователя
+-- Процедура для добавления нового пользователя
 CREATE OR REPLACE PROCEDURE Добавить_Пользователя(
     p_Имя VARCHAR2,
     p_Фамилия VARCHAR2,
@@ -142,4 +130,51 @@ CREATE OR REPLACE PROCEDURE Добавить_Пользователя(
 AS
 BEGIN
     INSERT INTO Пользователь (ID, Имя, Фамилия, Роль, Данные)
-    VALUES (seq_Отзывы.NEXTVAL
+    VALUES (seq_Отзывы.NEXTVAL, p_Имя, p_Фамилия, p_Роль, p_Данные);
+END;
+/
+
+-- Процедура для обновления товара
+CREATE OR REPLACE PROCEDURE Обновить_Товар(
+    p_ID_Лота INT,
+    p_ID_Пользователя INT,
+    p_ID_Категории INT,
+    p_Цена FLOAT
+)
+AS
+BEGIN
+    UPDATE Товары
+    SET
+        ID_Пользователя = p_ID_Пользователя,
+        ID_Категории = p_ID_Категории,
+        Цена = p_Цена
+    WHERE
+        ID_Лота = p_ID_Лота;
+END;
+/
+
+-- Процедура для закрытия запроса в техническую поддержку
+CREATE OR REPLACE PROCEDURE Закрыть_Запрос_В_Тех_Поддежку(
+    p_ID INT
+)
+AS
+BEGIN
+    UPDATE Запросы_В_Тех_Поддежку
+    SET
+        Статус = 0
+    WHERE
+        ID = p_ID;
+END;
+/
+
+-- Создание индекса для ускорения поиска пользователей по их идентификаторам
+CREATE INDEX IX_Пользователь_ID ON Пользователь(ID);
+
+-- Создание триггера для установки даты и времени добавления нового пользователя
+CREATE OR REPLACE TRIGGER trg_Добавление_Пользователя
+BEFORE INSERT ON Пользователь
+FOR EACH ROW
+BEGIN
+    :NEW.Дата_и_время := SYSTIMESTAMP;
+END;
+/
