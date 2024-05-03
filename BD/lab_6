@@ -308,3 +308,70 @@ WITH ProductSales AS (
 SELECT ProductID,ProductName,TotalSales
 FROM  ProductSales
 WHERE  Rank = 1;
+
+
+
+
+-------------------------------
+Функция для возвращения для каждого пользователя последних 3 сделок:
+sql
+Copy code
+SELECT DealID, UserID, ProductID, DealDate
+FROM (
+    SELECT DealID, UserID, ProductID, DealDate,
+           ROW_NUMBER() OVER (PARTITION BY UserID ORDER BY DealDate DESC) AS RowNum
+    FROM Deals
+) RankedDeals
+WHERE RowNum <= 3;
+
+
+Функция для применения функции ранжирования ROW_NUMBER() для удаления дубликатов:
+sql
+Copy code
+WITH RankedRows AS (
+    SELECT DealID, UserID, ProductID, DealDate,
+           ROW_NUMBER() OVER (PARTITION BY UserID, DealDate, ProductID ORDER BY DealID) AS RowNum
+    FROM Deals
+)
+SELECT DealID, UserID, ProductID, DealDate
+FROM RankedRows
+WHERE RowNum = 1;
+
+
+
+Функция для применения функции ранжирования ROW_NUMBER() для разбиения результатов запроса на страницы (по 20 строк на каждую страницу):
+sql
+Copy code
+SELECT *
+FROM (
+    SELECT *,
+           ROW_NUMBER() OVER (ORDER BY DealID) AS RowNum,
+           CEIL(ROW_NUMBER() OVER (ORDER BY DealID) / 20) AS PageNumber
+    FROM Deals
+) NumberedDeals
+WHERE PageNumber = 1;
+
+
+
+Функция для вычисления итогов предоставленных услуг за определенный период сравнение их с общим объемом услуг (в %) и сравнение с максимальным объемом услуг (в %):
+sql
+Copy code
+WITH TotalDeals AS (
+    SELECT YEAR(DealDate) AS Year, MONTH(DealDate) AS Month, SUM(ProductPrice) AS TotalAmount
+    FROM Deals
+    GROUP BY YEAR(DealDate), MONTH(DealDate)
+),
+UserDeals AS (
+    SELECT YEAR(DealDate) AS Year, MONTH(DealDate) AS Month, SUM(ProductPrice) AS UserTotalAmount
+    FROM Deals
+    WHERE UserID = 101 -- Замените на нужный вам UserID
+    GROUP BY YEAR(DealDate), MONTH(DealDate)
+)
+SELECT UD.Year, UD.Month, UD.UserTotalAmount,
+       UD.UserTotalAmount * 100.0 / TD.TotalAmount AS PercentageOfTotal,
+       UD.UserTotalAmount * 100.0 / MD.MaxAmount AS PercentageOfMax
+FROM UserDeals UD
+JOIN TotalDeals TD ON UD.Year = TD.Year AND UD.Month = TD.Month
+JOIN (SELECT MAX(TotalAmount) AS MaxAmount FROM TotalDeals) MD ON 1=1;
+
+
