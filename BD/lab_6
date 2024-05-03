@@ -278,7 +278,6 @@ FROM RankedRows
 WHERE RowNum = 1
 ORDER BY DealID;
 
-
 -- Функция для возвращения для каждого пользователя последних 3 сделок
 WITH RankedDeals AS (
     SELECT *, ROW_NUMBER() OVER (PARTITION BY UserID ORDER BY DealDate DESC) AS RowNum
