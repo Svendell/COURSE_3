@@ -315,108 +315,85 @@ WHERE  Rank = 1;
 -------------------------------
 ----------------------------
 --------------------------------
+--Функция для возвращения для каждого пользователя последних 3 сделок:
+WITH RankedDeals AS (
+    SELECT 
+        DealID,
+        UserID,
+        ProductID,
+        DealDate,
+        ROW_NUMBER() OVER (PARTITION BY UserID ORDER BY DealDate DESC) AS RowNum
+    FROM 
+        Deals
+)
+SELECT 
+    DealID,
+    UserID,
+    ProductID,
+    DealDate
+FROM  
+    RankedDeals
+WHERE 
+    RowNum <= 3;
 
-Функция для возвращения для каждого пользователя последних 3 сделок:
-sql
-Copy code
-DECLARE
-    CURSOR c_deals IS
-        SELECT DealID, UserID, ProductID, DealDate
-        FROM (
-            SELECT DealID, UserID, ProductID, DealDate,
-                   ROW_NUMBER() OVER (PARTITION BY UserID ORDER BY DealDate DESC) AS RowNum
-            FROM Deals
-        ) RankedDeals
-        WHERE RowNum <= 3;
-BEGIN
-    FOR deal IN c_deals LOOP
-        DBMS_OUTPUT.PUT_LINE('DealID: ' || deal.DealID || ', UserID: ' || deal.UserID || ', ProductID: ' || deal.ProductID || ', DealDate: ' || TO_CHAR(deal.DealDate, 'YYYY-MM-DD'));
-    END LOOP;
-END;
-/
-Функция для применения функции ранжирования ROW_NUMBER() для удаления дубликатов:
-sql
-Copy code
-DECLARE
-    CURSOR c_deals IS
-        WITH RankedRows AS (
-            SELECT DealID, UserID, ProductID, DealDate,
-                   ROW_NUMBER() OVER (PARTITION BY UserID, DealDate, ProductID ORDER BY DealID) AS RowNum
-            FROM Deals
-        )
-        SELECT DealID, UserID, ProductID, DealDate
-        FROM RankedRows
-        WHERE RowNum = 1;
-BEGIN
-    FOR deal IN c_deals LOOP
-        DBMS_OUTPUT.PUT_LINE('DealID: ' || deal.DealID || ', UserID: ' || deal.UserID || ', ProductID: ' || deal.ProductID || ', DealDate: ' || TO_CHAR(deal.DealDate, 'YYYY-MM-DD'));
-    END LOOP;
-END;
-/
-Функция для применения функции ранжирования ROW_NUMBER() для разбиения результатов запроса на страницы (по 20 строк на каждую страницу):
-sql
-Copy code
-DECLARE
-    CURSOR c_deals IS
-        SELECT *
-        FROM (
-            SELECT *,
-                   ROW_NUMBER() OVER (ORDER BY DealID) AS RowNum,
-                   CEIL(ROW_NUMBER() OVER (ORDER BY DealID) / 20) AS PageNumber
-            FROM Deals
-        ) NumberedDeals
-        WHERE PageNumber = 1;
-BEGIN
-    FOR deal IN c_deals LOOP
-        DBMS_OUTPUT.PUT_LINE('DealID: ' || deal.DealID || ', UserID: ' || deal.UserID || ', ProductID: ' || deal.ProductID || ', DealDate: ' || TO_CHAR(deal.DealDate, 'YYYY-MM-DD'));
-    END LOOP;
-END;
-/
-Функция для вычисления итогов предоставленных услуг за определенный период сравнение их с общим объемом услуг (в %) и сравнение с максимальным объемом услуг (в %):
-sql
-Copy code
-DECLARE
-    StartDate DATE := TO_DATE('2023-01-01', 'YYYY-MM-DD');
-    EndDate DATE := TO_DATE('2023-12-31', 'YYYY-MM-DD');
-    UserID INT := 101; -- Идентификатор конкретного пользователя
-    TotalAmount DECIMAL(10, 2);
-    MaxAmount DECIMAL(10, 2);
-    UserTotalAmount DECIMAL(10, 2);
-BEGIN
-    -- Получаем общий объем всех сделок за указанный период
-    SELECT SUM(P.ProductPrice)
-    INTO TotalAmount
-    FROM Deals D
-    JOIN Products P ON D.ProductID = P.ProductID
-    WHERE D.DealDate BETWEEN StartDate AND EndDate;
 
-    -- Получаем максимальный объем всех сделок за указанный период
-    SELECT MAX(TotalAmount)
-    INTO MaxAmount
-    FROM (
-        SELECT SUM(P.ProductPrice) AS TotalAmount
-        FROM Deals D
-        JOIN Products P ON D.ProductID = P.ProductID
-        WHERE D.DealDate BETWEEN StartDate AND EndDate
-        GROUP BY EXTRACT(YEAR FROM D.DealDate), EXTRACT(MONTH FROM D.DealDate)
-    );
 
-    -- Вычисляем итоговую сумму сделок для конкретного пользователя за указанный период
-    SELECT SUM(P.ProductPrice)
-    INTO UserTotalAmount
-    FROM Deals D
-    JOIN Products P ON D.ProductID = P.ProductID
-    JOIN Users U ON D.UserID = U.UserID
-    WHERE D.DealDate BETWEEN StartDate AND EndDate
-    AND U.UserID = UserID;
+--Функция для применения функции ранжирования ROW_NUMBER() для удаления дубликатов:
 
-    -- Выводим результаты
-    DBMS_OUTPUT.PUT_LINE('TotalDealAmount: ' || UserTotalAmount);
-    DBMS_OUTPUT.PUT_LINE('PercentageOfTotal: ' || (UserTotalAmount * 100.0) / TotalAmount);
-    IF MaxAmount > 0 THEN
-        DBMS_OUTPUT.PUT_LINE('PercentageOfMax: ' || (UserTotalAmount * 100.0) / MaxAmount);
-    ELSE
-        DBMS_OUTPUT.PUT_LINE('PercentageOfMax: 0');
-    END IF;
-END;
-/
+WITH RankedRows AS (
+    SELECT 
+        DealID, 
+        UserID, 
+        ProductID, 
+        DealDate,
+        ROW_NUMBER() OVER (PARTITION BY UserID, DealDate, ProductID ORDER BY DealID) AS RowNum
+    FROM 
+        Deals
+)
+SELECT 
+    DealID,
+    UserID,
+    ProductID,
+    DealDate
+FROM 
+    RankedRows
+WHERE 
+    RowNum = 1
+ORDER BY 
+    DealID;
+
+
+
+--Функция для применения функции ранжирования ROW_NUMBER() для разбиения результатов запроса на страницы (по 20 строк на каждую страницу):
+
+SELECT *
+FROM (
+    SELECT 
+        *,
+        ROW_NUMBER() OVER (ORDER BY DealID) AS RowNum,
+        CEIL(ROW_NUMBER() OVER (ORDER BY DealID) / 20) AS PageNumber
+    FROM 
+        Deals
+) NumberedDeals
+WHERE 
+    PageNumber = 1;
+
+
+
+--Функция для вычисления итогов предоставленных услуг за определенный период сравнение их с общим объемом услуг (в %) и сравнение с максимальным объемом услуг (в %):
+SELECT 
+    EXTRACT(YEAR FROM DealDate) AS "Year",
+    EXTRACT(MONTH FROM DealDate) AS "Month",
+    SUM(ProductPrice) AS TotalDealAmount,
+    100 * SUM(ProductPrice) / SUM(SUM(ProductPrice)) OVER (PARTITION BY EXTRACT(YEAR FROM DealDate), EXTRACT(MONTH FROM DealDate)) AS PercentageOfTotal,
+    MAX(SUM(ProductPrice)) OVER (PARTITION BY EXTRACT(YEAR FROM DealDate), EXTRACT(MONTH FROM DealDate)) AS MaxAmount,
+    100 * SUM(ProductPrice) / MAX(SUM(ProductPrice)) OVER (PARTITION BY EXTRACT(YEAR FROM DealDate), EXTRACT(MONTH FROM DealDate)) AS PercentageOfMax
+FROM 
+    Deals
+JOIN 
+    Products ON Deals.ProductID = Products.ProductID
+GROUP BY 
+    EXTRACT(YEAR FROM DealDate), EXTRACT(MONTH FROM DealDate)
+ORDER BY 
+    "Year", "Month";
+
