@@ -198,9 +198,9 @@ ORDER BY
 
 
 ----2
-
+-- Функция для вычисления итогов предоставленных услуг за определенный период
 SELECT
-    EXTRACT(YEAR FROM DealDate) AS "Year",
+    DISTINCT EXTRACT(YEAR FROM DealDate) AS "Year",
     EXTRACT(MONTH FROM DealDate) AS "Month",
     SUM(ProductPrice) OVER(PARTITION BY EXTRACT(YEAR FROM DealDate), EXTRACT(MONTH FROM DealDate)) AS TotalDealAmount
 FROM
@@ -208,22 +208,25 @@ FROM
 JOIN Products ON Deals.ProductID = Products.ProductID;
 
 
-----3
 
+-- Функция для вычисления итогов предоставленных услуг за
+--определенный период сравнение их с общим объемом услуг (в %) и сравнение с максимальным объемом услуг (в %)
 DECLARE
     StartDate DATE := TO_DATE('2023-01-01', 'YYYY-MM-DD');
     EndDate DATE := TO_DATE('2023-12-31', 'YYYY-MM-DD');
-    UserID INT := 101;
+    UserID INT := 101; -- Идентификатор конкретного пользователя
     TotalAmount DECIMAL(10, 2);
     MaxAmount DECIMAL(10, 2);
     UserTotalAmount DECIMAL(10, 2);
 BEGIN
+    -- Получаем общий объем всех сделок за указанный период
     SELECT SUM(P.ProductPrice)
     INTO TotalAmount
     FROM Deals D
     JOIN Products P ON D.ProductID = P.ProductID
     WHERE D.DealDate BETWEEN StartDate AND EndDate;
 
+    -- Получаем максимальный объем всех сделок за указанный период
     SELECT MAX(TotalAmount)
     INTO MaxAmount
     FROM (
@@ -234,6 +237,7 @@ BEGIN
         GROUP BY EXTRACT(YEAR FROM D.DealDate), EXTRACT(MONTH FROM D.DealDate)
     );
 
+    -- Вычисляем итоговую сумму сделок для конкретного пользователя за указанный период
     SELECT SUM(P.ProductPrice)
     INTO UserTotalAmount
     FROM Deals D
@@ -242,6 +246,7 @@ BEGIN
     WHERE D.DealDate BETWEEN StartDate AND EndDate
     AND U.UserID = UserID;
 
+    -- Выводим результаты
     DBMS_OUTPUT.PUT_LINE('TotalDealAmount: ' || UserTotalAmount);
     DBMS_OUTPUT.PUT_LINE('PercentageOfTotal: ' || (UserTotalAmount * 100.0) / TotalAmount);
     IF MaxAmount > 0 THEN
@@ -251,20 +256,24 @@ BEGIN
     END IF;
 END;
 
---4
+
+
+-- Функция для применения функции ранжирования ROW_NUMBER() 
+--для разбиения результатов запроса на страницы (по 20 строк на каждую страницу)
 SELECT *
 FROM (
     SELECT *,
            ROW_NUMBER() OVER (ORDER BY DealID) AS RowNum,
            CEIL(ROW_NUMBER() OVER (ORDER BY DealID) / 20) AS PageNumber
     FROM Deals
-) AS NumberedDeals
+) NumberedDeals
 WHERE PageNumber = 1;
 
 
----5
+
+-- Функция для применения функции ранжирования ROW_NUMBER() для удаления дубликатов
 WITH RankedRows AS (
-    SELECT *, ROW_NUMBER() OVER (PARTITION BY UserID, DealDate, ProductID ORDER BY DealID) AS RowNum
+    SELECT *,  ROW_NUMBER() OVER (PARTITION BY UserID, DealDate, ProductID ORDER BY DealID) AS RowNum
     FROM Deals
 )
 SELECT *
@@ -272,18 +281,18 @@ FROM RankedRows
 WHERE RowNum = 1
 ORDER BY DealID;
 
-
----6
+-- Функция для возвращения для каждого пользователя последних 3 сделок
 WITH RankedDeals AS (
     SELECT *, ROW_NUMBER() OVER (PARTITION BY UserID ORDER BY DealDate DESC) AS RowNum
     FROM Deals
 )
-SELECT DealID, UserID, ProductID, DealDate
-FROM RankedDeals
+SELECT DealID,UserID,ProductID,DealDate
+FROM  RankedDeals
 WHERE RowNum <= 3;
 
 
----7
+
+-- Функция для нахождения наиболее популярного продукта
 WITH ProductSales AS (
     SELECT
         P.ProductID,
@@ -296,6 +305,6 @@ WITH ProductSales AS (
         P.ProductID,
         P.ProductName
 )
-SELECT ProductID, ProductName, TotalSales
-FROM ProductSales
-WHERE Rank = 1;
+SELECT ProductID,ProductName,TotalSales
+FROM  ProductSales
+WHERE  Rank = 1;
