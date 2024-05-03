@@ -209,8 +209,7 @@ JOIN Products ON Deals.ProductID = Products.ProductID;
 
 
 
--- Функция для вычисления итогов предоставленных услуг за
---определенный период сравнение их с общим объемом услуг (в %) и сравнение с максимальным объемом услуг (в %)
+-- Функция для вычисления итогов предоставленных услуг за определенный период сравнение их с общим объемом услуг (в %) и сравнение с максимальным объемом услуг (в %)
 DECLARE
     StartDate DATE := TO_DATE('2023-01-01', 'YYYY-MM-DD');
     EndDate DATE := TO_DATE('2023-12-31', 'YYYY-MM-DD');
@@ -255,11 +254,10 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('PercentageOfMax: 0');
     END IF;
 END;
+/
 
 
-
--- Функция для применения функции ранжирования ROW_NUMBER() 
---для разбиения результатов запроса на страницы (по 20 строк на каждую страницу)
+-- Функция для применения функции ранжирования ROW_NUMBER() для разбиения результатов запроса на страницы (по 20 строк на каждую страницу)
 SELECT *
 FROM (
     SELECT *,
@@ -268,7 +266,6 @@ FROM (
     FROM Deals
 ) NumberedDeals
 WHERE PageNumber = 1;
-
 
 
 -- Функция для применения функции ранжирования ROW_NUMBER() для удаления дубликатов
@@ -281,13 +278,14 @@ FROM RankedRows
 WHERE RowNum = 1
 ORDER BY DealID;
 
+
 -- Функция для возвращения для каждого пользователя последних 3 сделок
 WITH RankedDeals AS (
     SELECT *, ROW_NUMBER() OVER (PARTITION BY UserID ORDER BY DealDate DESC) AS RowNum
     FROM Deals
 )
-SELECT DealID,UserID,ProductID,DealDate
-FROM  RankedDeals
+SELECT DealID, UserID, ProductID, DealDate
+FROM RankedDeals
 WHERE RowNum <= 3;
 
 
