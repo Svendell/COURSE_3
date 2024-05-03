@@ -260,32 +260,35 @@ END;
 -- Функция для применения функции ранжирования ROW_NUMBER() для разбиения результатов запроса на страницы (по 20 строк на каждую страницу)
 SELECT *
 FROM (
-    SELECT *,
-           ROW_NUMBER() OVER (ORDER BY DealID) AS RowNum,
-           CEIL(ROW_NUMBER() OVER (ORDER BY DealID) / 20) AS PageNumber
-    FROM Deals
+    SELECT D.*, 
+           ROW_NUMBER() OVER (ORDER BY D.DealID) AS RowNum,
+           CEIL(ROW_NUMBER() OVER (ORDER BY D.DealID) / 20) AS PageNumber
+    FROM Deals D
 ) NumberedDeals
 WHERE PageNumber = 1;
 
 
 -- Функция для применения функции ранжирования ROW_NUMBER() для удаления дубликатов
 WITH RankedRows AS (
-    SELECT *,  ROW_NUMBER() OVER (PARTITION BY UserID, DealDate, ProductID ORDER BY DealID) AS RowNum
-    FROM Deals
+    SELECT D.*,  
+           ROW_NUMBER() OVER (PARTITION BY D.UserID, D.DealDate, D.ProductID ORDER BY D.DealID) AS RowNum
+    FROM Deals D
 )
 SELECT *
 FROM RankedRows
 WHERE RowNum = 1
 ORDER BY DealID;
 
+
 -- Функция для возвращения для каждого пользователя последних 3 сделок
 WITH RankedDeals AS (
-    SELECT *, ROW_NUMBER() OVER (PARTITION BY UserID ORDER BY DealDate DESC) AS RowNum
-    FROM Deals
+    SELECT D.*, 
+           ROW_NUMBER() OVER (PARTITION BY D.UserID ORDER BY D.DealDate DESC) AS RowNum
+    FROM Deals D
 )
 SELECT DealID, UserID, ProductID, DealDate
 FROM RankedDeals
-WHERE RowNum <= 3;
+WHERE RowNum <= 3; 
 
 
 
